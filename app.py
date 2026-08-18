@@ -3,11 +3,11 @@ import os
 from google import genai
 
 # Streamlit Secrets se API key load karein
-try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    client = genai.Client(api_key=api_key)
-except Exception:
-    client = genai.Client()
+
+    if "GEMINI_API_KEY" in st.secrets:
+    os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
+
+client = genai.Client()
 
 # Web page ka look set karein
 st.set_page_config(page_title="Real Estate AI Assistant", page_icon="🏢")
