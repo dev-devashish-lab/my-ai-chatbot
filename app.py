@@ -21,28 +21,23 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if user_input := st.chat_input("Ask about properties or type your budget..."):
+if user_input := st.chat_input("ask about properties..."):
     with st.chat_message("user"):
         st.markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     with st.chat_message("assistant"):
         response_placeholder = st.empty()
-        
-        # System instruction ke saath expert prompt set kiya hai
+
         response = client.models.generate_content(
             model='gemini-1.5-flash',
             contents=user_input,
             config={
-                'system_instruction': (
-                    "You are a premium, ultra-professional Real Estate Sales Agent for a luxury property agency. "
-                    "Your main goal is to help clients and politely capture their Name, Phone Number, Budget, and Preferred Location. "
-                    "Always sound sophisticated, highly helpful, and executive. Speak strictly in English."
-                )
+                'system_instruction': "You are a professional Real Estate Sales Agent. Help clients and politely capture their Name, Phone, Budget, and Location. Speak strictly in English."
             }
-        )
-        
-        ai_response = response.text
-        response_placeholder.markdown(ai_response)
-        
-    st.session_state.messages.append({"role": "assistant", "content": ai_response}
+         )
+
+         ai_response = response.text
+         response_placeholder.markdown(ai_response)
+     
+    st.session_state.messages.append({"role": "assistant", "content": ai_response})
