@@ -2,9 +2,8 @@ import streamlit as st
 import os
 from google import genai
 
-# Streamlit Secrets se API key load karein
-
-    if "GEMINI_API_KEY" in st.secrets:
+# Spacing error ko door karne ke liye ekdam direct setup
+if "GEMINI_API_KEY" in st.secrets:
     os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
 
 client = genai.Client()
@@ -29,7 +28,6 @@ if user_input := st.chat_input("Ask about properties or type your budget..."):
     with st.chat_message("assistant"):
         response_placeholder = st.empty()
         
-        # Ekdam sahi formatting wala Gemini API call
         response = client.models.generate_content(
             model='gemini-1.5-flash',
             contents=user_input,
