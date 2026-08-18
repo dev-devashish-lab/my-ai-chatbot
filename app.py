@@ -1,47 +1,48 @@
 import streamlit as st
 import os
 from google import genai
-from dotenv import load_dotenv
 
-# .env file se API key load karein
-load_dotenv()
+# Streamlit Secrets se API key load karein
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=api_key)
+except Exception:
+    client = genai.Client()
 
-# Gemini Client initialize karein
-client = genai.Client()
+# Web page ka look set karein
+st.set_page_config(page_title="Real Estate AI Assistant", page_icon="🏢")
+st.title("🏢 Premium Real Estate AI Agent")
+st.write("Welcome! I can help you find your dream property or capture premium buyer leads 24/7.")
 
-# Web page ka title aur look set karein
-st.set_page_config(page_title="AI Business Assistant", page_icon="🤖")
-st.title("🤖 AI Business Assistant")
-st.write("Welcome! How can I help your business today?")
-
-# Chat history ko yaad rakhne ke liye
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Purani baatein screen par dikhane ke liye
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# User se input lene ke liye chat box
-if user_input := st.chat_input("Type your message here..."):
-    # 1. User ka message screen par dikhao
+if user_input := st.chat_input("Ask about properties or type your budget..."):
     with st.chat_message("user"):
         st.markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # 2. Gemini se response lo
     with st.chat_message("assistant"):
         response_placeholder = st.empty()
         
-        # Latest Gemini API call
+        # System instruction ke saath expert prompt set kiya hai
         response = client.models.generate_content(
-            model='gemini-3.6-flash',
-            contents=user_input
+            model='gemini-1.5-flash',
+            contents=user_input,
+            config={
+                'system_instruction': (
+                    "You are a premium, ultra-professional Real Estate Sales Agent for a luxury property agency. "
+                    "Your main goal is to help clients and politely capture their Name, Phone Number, Budget, and Preferred Location. "
+                    "Always sound sophisticated, highly helpful, and executive. Speak strictly in English."
+                )
+            }
         )
         
         ai_response = response.text
         response_placeholder.markdown(ai_response)
         
-    # 3. AI ka response history mein save karo
-    st.session_state.messages.append({"role": "assistant", "content": ai_response})
+    st.session_state.messages.append({"role": "assistant", "content": ai_response}
